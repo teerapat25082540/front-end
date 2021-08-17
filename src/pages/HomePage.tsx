@@ -1,5 +1,5 @@
 import { CloseCircleOutlined } from "@ant-design/icons";
-import { Modal, Drawer, Spin, Button, Result } from "antd";
+import { Modal, Drawer, Button, Result } from "antd";
 import axios from "axios";
 import React, { useState } from "react";
 import { VaccineMap, longdo, map } from "../components/VaccineMap";
@@ -10,14 +10,14 @@ const HomePage = () => {
 
   // state
   const [country, setCountry] = useState<string | null>(null);
-  const [geocode, setGeocode] = useState<string | null>(null);
+  // const [geocode, setGeocode] = useState<string | null>(null);
   const [province, setProvince] = useState<string | null>(null);
   const [district, setDistrict] = useState<string | null>(null);
   const [subdistrict, setSubdistrict] = useState<string | null>(null);
-  const [postcode, setPostcode] = useState<string>("");
-  const [elevation, setElevation] = useState<number | null>(0);
+  // const [postcode, setPostcode] = useState<string>("");
+  // const [elevation, setElevation] = useState<number | null>(0);
   const [road, setRoad] = useState<String | null>(null);
-  const [description, setDescription] = useState<string | null>();
+  // const [description, setDescription] = useState<string | null>();
   const [email, setEmail] = useState<string>("");
   const [vaccineName, setVaccineName] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
@@ -103,6 +103,7 @@ const HomePage = () => {
       }
     );
     map.Overlays.add(userMarker);
+    //map.Overlays.bounce(userMarker)
     map.location({ lon: location[1], lat: location[0] }, true);
   };
 
@@ -113,11 +114,11 @@ const HomePage = () => {
     );
     setCountry(res.data.country);
     setProvince(res.data.province);
-    setGeocode(res.data.geocode);
+    //(res.data.geocode);
     setDistrict(res.data.district);
     setSubdistrict(res.data.subdistrict);
-    setPostcode(res.data.postcode);
-    setElevation(res.data.elevation);
+    //setPostcode(res.data.postcode);
+    //setElevation(res.data.elevation);
     setRoad(res.data.road);
     setAoi(res.data.aoi);
   };
@@ -145,7 +146,7 @@ const HomePage = () => {
           setTel(item.tel);
           setLngDestinnation(item.long);
           setLatDestinnation(item.lat);
-          setDescription(item.description);
+          //setDescription(item.description);
           mapLatLonToAddress(item.lat, item.long);
           showModal();
         }
@@ -176,8 +177,9 @@ const HomePage = () => {
   };
 
   return (
-    <MainLayouts page="1" showDrawer={showDrawer}>
+    <MainLayouts page="1" showDrawer={showDrawer} loadingRoute={setLoading}>
       <VaccineMap id="vaccine-map" mapKey={mapKey} callback={initMap} />
+      {/* <Button onClick={() => map.Route.clear()}> 1234 </Button> */}
       <Modal
         visible={isModalVisible}
         title={<b>Vaccine Location</b>}
@@ -254,17 +256,17 @@ const HomePage = () => {
         </p>
       </Modal>
       <Drawer
-        title="Route Detail"
+        title="เลือกเส้นทาง"
         visible={isDrawerVisible}
         onClose={drawerCancel}
         width={530}
       >
         {inValidRoute ? (
-          <div style={{}} id="manage-route"></div>
+          <div style={{ height: "100%"}} id="manage-route"></div>
         ) : (
           <Result
             icon={<CloseCircleOutlined />}
-            title="Not found destination"
+            title="ขออภัย ! ท่านยังไม่เลือกจุดรับวัคซีน"
           />
         )}
       </Drawer>

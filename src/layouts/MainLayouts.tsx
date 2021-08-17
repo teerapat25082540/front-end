@@ -1,14 +1,5 @@
-import React, { useRef, useState, useEffect } from "react";
-import {
-  Layout,
-  Menu,
-  Image,
-  Button,
-  Input,
-  Form,
-  InputNumber,
-  AutoComplete,
-} from "antd";
+import React, { useRef, useState } from "react";
+import { Layout, Menu, Image, Button, Input, Form, InputNumber } from "antd";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -31,18 +22,7 @@ import ListSearch from "../components/ListSearch";
 import Swal from "sweetalert2";
 
 const { Header, Sider } = Layout;
-const { Option } = AutoComplete;
-
-const validateMessages = {
-  required: "กรุณากรอก ${label}",
-  types: {
-    email: "${label} is not a valid email!",
-    number: "${label} is not a valid number!",
-  },
-  number: {
-    range: "${label} must be between ${min} and ${max}",
-  },
-};
+// const { Option } = AutoComplete;
 
 function MainLayouts({ children, page = 1, showDrawer }: any) {
   const [state, setState] = useState({
@@ -53,6 +33,7 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
   const [lat, setLat] = useState<number>(0);
   const [lon, setLon] = useState<number>(0);
   const [checkUpdate, setCheckUpdate] = useState(false);
+  //const [routeLoading, setRouteLoading] = useState<boolean>(false);
 
   const addressRef = useRef<any>();
   const history = useHistory();
@@ -114,11 +95,6 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
     setModalAddData(false);
   };
 
-  // submit form Faile
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-  };
-
   // select item address
   const selectSearchItem = (item: any) => {
     setLat(item.lat);
@@ -165,7 +141,9 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
           {state.collapsed ? (
             <Image className="logo" preview={false} src={VaccineIcon} />
           ) : (
-            <h2 className="logo-text">Vaccine Map</h2>
+            <div>
+              <h2 className="logo-text">Vaccine Map</h2>
+            </div>
           )}
           <Menu
             onSelect={(e) => selectPage(e)}
@@ -173,7 +151,6 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
             theme="dark"
             defaultSelectedKeys={["1"]}
           >
-            
             <Menu.Item key="1" icon={<FaMapMarkedAlt />}>
               จุดรับวัคซีน
             </Menu.Item>
@@ -211,6 +188,7 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
                   type="primary"
                   icon={<MonitorOutlined />}
                   onClick={() => showDrawer()}
+                  //loading={routeLoading}
                 >
                   เลือกเส้นทาง
                 </Button>
@@ -240,13 +218,12 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
             layout="vertical"
             name="nest-messages"
             onFinish={confirmSubmit}
-            validateMessages={validateMessages}
           >
             <Form.Item style={{ marginBottom: 0 }}>
               <Form.Item
                 name="vaccine"
                 label="ชื่อวัคซีน"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: "กรุณากรอกชื่อวัคซีน" }]}
                 style={{ display: "inline-block", width: "calc(50%)" }}
               >
                 <Input placeholder="ชื่อวัคซีน" />
@@ -254,7 +231,7 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
               <Form.Item
                 name="amount"
                 label="จำนวน"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: "กรุณากรอกจำนวนวัคซีน" }]}
                 style={{
                   display: "inline-block",
                   margin: "0 8px",
@@ -271,7 +248,7 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
             <Form.Item
               name="description"
               label="รายละเอียด"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "กรุณากรอกรายละเอียด" }]}
             >
               <TextArea placeholder="รายละเอียด" rows={4} />
             </Form.Item>
@@ -280,14 +257,16 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
               label="พิกัดที่อยู่"
               //rules={[{ required: true }]}
             >
-              <Input
-                prefix={<SearchOutlined />}
-                onKeyUp={(e) => onKeyUpSeach(e)}
-                defaultValue={addressRef.current}
-                placeholder="search address"
-                ref={addressRef}
-              />
-              <ListSearch selectItem={selectSearchItem} data={suggestions} />
+              <div>
+                <Input
+                  prefix={<SearchOutlined />}
+                  onKeyUp={(e) => onKeyUpSeach(e)}
+                  //defaultValue={addressRef.current}
+                  placeholder="search address"
+                  ref={addressRef}
+                />
+                <ListSearch selectItem={selectSearchItem} data={suggestions} />
+              </div>
             </Form.Item>
             <div style={{ height: "250px", marginTop: 10 }}>
               <MapForm id="map-form" mapKey={mapKey} callback={initMap} />
