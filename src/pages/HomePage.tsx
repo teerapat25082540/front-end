@@ -176,10 +176,16 @@ const HomePage = () => {
     handleOk();
   };
 
+  const clearRoute = () => {
+    map.Route.clear();
+    setLatDestinnation(null);
+    setLngDestinnation(null);
+  }
+
   return (
-    <MainLayouts page="1" showDrawer={showDrawer} loadingRoute={setLoading}>
+    <MainLayouts page="1" showDrawer={showDrawer} loadingRoute={setLoading} clearRoute={clearRoute}>
       <VaccineMap id="vaccine-map" mapKey={mapKey} callback={initMap} />
-      {/* <Button onClick={() => map.Route.clear()}> 1234 </Button> */}
+      <Button onClick={() => clearRoute()}> 1234 </Button>
       <Modal
         visible={isModalVisible}
         title={<b>Vaccine Location</b>}

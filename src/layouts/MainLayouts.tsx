@@ -6,6 +6,8 @@ import {
   PlusOutlined,
   SearchOutlined,
   MonitorOutlined,
+
+  ReloadOutlined,
 } from "@ant-design/icons";
 
 import { FaMapMarkedAlt, FaListAlt, FaUser } from "react-icons/fa";
@@ -14,7 +16,7 @@ import { Content } from "antd/lib/layout/layout";
 import VaccineIcon from "../images/vaccine-icon.png";
 import { useHistory } from "react-router-dom";
 import Modal from "antd/lib/modal/Modal";
-import { MapForm, map, longdo } from "../components/MapForm";
+import { MapForm, map, longdo } from "../components/MapAddForm";
 import TextArea from "antd/lib/input/TextArea";
 import axios from "axios";
 import { TypeNewVaccine } from "../DataType";
@@ -24,7 +26,7 @@ import Swal from "sweetalert2";
 const { Header, Sider } = Layout;
 // const { Option } = AutoComplete;
 
-function MainLayouts({ children, page = 1, showDrawer }: any) {
+function MainLayouts({ children, page = 1, showDrawer, clearRoute }: any) {
   const [state, setState] = useState({
     collapsed: false,
   });
@@ -78,11 +80,11 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
   // sunmit form success
   const onFinish = async (values: any) => {
     const newVaccine: TypeNewVaccine = {
-      user_id: "1623ec45-6a6a-44c0-a577-e12439035818",
+      user_id: "a6a96d52-7748-4df5-85a1-dc96c9f0d0",
       name: values.vaccine,
       amount: Number(values.amount),
-      email: "one@example.com",
-      tel: "00000000",
+      email: "teerapat.seeharach@gmail.com",
+      tel: "0982612614",
       lat: lat,
       long: lon,
       description: values.description,
@@ -127,7 +129,7 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
         history.push("/");
         break;
       case "2":
-        history.push("/test");
+        history.push("/manage");
         break;
       default:
       //alert("break");
@@ -192,6 +194,16 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
                 >
                   เลือกเส้นทาง
                 </Button>
+
+                <Button
+                  style={{ width: 170, marginLeft: 10 }}
+                  type="primary"
+                  icon={<ReloadOutlined />}
+                  onClick={() => clearRoute()}
+                  //loading={routeLoading}
+                >
+                  คืนค่าเดิม
+                </Button>
               </>
             ) : null}
           </Header>
@@ -241,7 +253,7 @@ function MainLayouts({ children, page = 1, showDrawer }: any) {
                   placeholder="จำนวนโดส"
                   style={{ width: "calc(127%)" }}
                   min={1}
-                  max={10}
+                  max={100000000}
                 />
               </Form.Item>
             </Form.Item>
