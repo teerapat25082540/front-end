@@ -7,7 +7,6 @@ import { TypeVaccine, getCurrentLocation } from "../DataType";
 import MainLayouts from "../layouts/MainLayouts";
 
 const HomePage = () => {
-
   // state
   const [country, setCountry] = useState<string | null>(null);
   // const [geocode, setGeocode] = useState<string | null>(null);
@@ -25,6 +24,8 @@ const HomePage = () => {
   const [aoi, setAoi] = useState<string | null>(null);
   const [latDestination, setLatDestinnation] = useState<any>(null);
   const [lngDestination, setLngDestinnation] = useState<any>(null);
+  const [visibleRouteButton, setVisibleRouteButton] = useState<any>(false);
+  const [visibleRouteClear, setVisibleRouteClear] = useState<any>(false);
 
   // longdo key api
   const mapKey: string = "f065b431c7c8afab7264d32ca7a8a11e";
@@ -54,7 +55,7 @@ const HomePage = () => {
     setIsModalVisible(false);
   };
 
-  // show drawer 
+  // show drawer
   const showDrawer = async () => {
     setLoadingRoute(true);
     let location: any = await getCurrentLocation();
@@ -178,16 +179,27 @@ const HomePage = () => {
     map.Route.add({ lon: lngDestination, lat: latDestination });
     map.Route.search();
     handleOk();
+    setVisibleRouteButton(true);
+    setVisibleRouteClear(true);
   };
 
   const clearRoute = () => {
     map.Route.clear();
     setLatDestinnation(null);
     setLngDestinnation(null);
-  }
+    setVisibleRouteButton(false);
+    setVisibleRouteClear(false);
+  };
 
   return (
-    <MainLayouts page="1" showDrawer={showDrawer} loadingRoute={loadingRoute} clearRoute={clearRoute}>
+    <MainLayouts
+      page="1"
+      showDrawer={showDrawer}
+      loadingRoute={loadingRoute}
+      clearRoute={clearRoute}
+      visibleRouteButton={visibleRouteButton}
+      visibleRouteClear={visibleRouteClear}
+    >
       <VaccineMap id="vaccine-map" mapKey={mapKey} callback={initMap} />
       <Modal
         visible={isModalVisible}
@@ -271,7 +283,7 @@ const HomePage = () => {
         width={530}
       >
         {inValidRoute ? (
-          <div style={{ height: "100%"}} id="manage-route"></div>
+          <div style={{ height: "100%" }} id="manage-route"></div>
         ) : (
           <Result
             icon={<CloseCircleOutlined />}

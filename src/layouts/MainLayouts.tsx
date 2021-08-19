@@ -39,6 +39,8 @@ function MainLayouts({
   showDrawer,
   clearRoute,
   loadingRoute,
+  visibleRouteButton,
+  visibleRouteClear,
 }: any) {
   const [state, setState] = useState({
     collapsed: false,
@@ -64,7 +66,6 @@ function MainLayouts({
       `https://search.longdo.com/mapsearch/json/search?keyword=${e.target.value}&limit=100&key=${mapKey}`
     );
     setSuggestions(res.data.data);
-    //checkUpdate ? setCheckUpdate(false) : setCheckUpdate(true);
   };
 
   const confirmSubmit = (values: any) => {
@@ -187,32 +188,34 @@ function MainLayouts({
                 >
                   เพิ่มข้อมูลวัคซีน
                 </Button>
-
-                <Button
-                  style={{
-                    width: 170,
-                    marginLeft: 10,
-                    // backgroundColor: "#011529",
-                    // borderColor: "#011529",
-                  }}
-                  type="primary"
-                  icon={<MonitorOutlined />}
-                  onClick={() => showDrawer()}
-                  loading={loadingRoute}
-                >
-                  เลือกเส้นทาง
-                </Button>
-
-                <Button
-                  style={{ width: 170, marginLeft: 10 }}
-                  type="primary"
-                  //danger
-                  icon={<ReloadOutlined />}
-                  onClick={() => clearRoute()}
-                  //loading={routeLoading}
-                >
-                  ล้างเส้นทาง
-                </Button>
+                {visibleRouteButton && (
+                  <Button
+                    style={{
+                      width: 170,
+                      marginLeft: 10,
+                      // backgroundColor: "#011529",
+                      // borderColor: "#011529",
+                    }}
+                    type="primary"
+                    icon={<MonitorOutlined />}
+                    onClick={() => showDrawer()}
+                    loading={loadingRoute}
+                  >
+                    เลือกเส้นทาง
+                  </Button>
+                )}
+                {visibleRouteClear && (
+                  <Button
+                    style={{ width: 170, marginLeft: 10 }}
+                    type="primary"
+                    //danger
+                    icon={<ReloadOutlined />}
+                    onClick={() => clearRoute()}
+                    //loading={routeLoading}
+                  >
+                    ล้างเส้นทาง
+                  </Button>
+                )}
               </>
             ) : null}
           </Header>
