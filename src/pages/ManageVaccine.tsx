@@ -13,7 +13,6 @@ import moment from "moment";
 import Highlighter from "react-highlight-words";
 import "../styles/EditVaccineForm.css";
 
-
 function ManageVaccine() {
   const mapKey: string = "f065b431c7c8afab7264d32ca7a8a11e";
   const [vaccine, setVaccine] = useState<object[]>([]);
@@ -49,26 +48,24 @@ function ManageVaccine() {
           style={{ marginBottom: 8, display: "block" }}
         />
         <div style={{ textAlign: "center" }}>
-        <Space>
-     
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-     
-        </Space>
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Search
+            </Button>
+            <Button
+              onClick={() => handleReset(clearFilters)}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Reset
+            </Button>
+          </Space>
         </div>
       </div>
     ),
@@ -107,7 +104,8 @@ function ManageVaccine() {
       align: "center" as "center",
       width: 100,
       key: 1,
-      ...getColumnSearchProps('name'),
+      sorter: (a: any, b: any) => a.name.length - b.name.length,
+      ...getColumnSearchProps("name"),
       // sorter: (a:any, b:any) => a.address.length - b.address.length,
       // sortDirections: ['descend', 'ascend'],
     },
@@ -115,7 +113,7 @@ function ManageVaccine() {
       title: <h4 style={{ textAlign: "center" }}>จำนวนโดส</h4>,
       dataIndex: "amount",
       align: "center" as "center",
-      width: 100,
+      width: 50,
       key: 2,
     },
     {
@@ -124,12 +122,13 @@ function ManageVaccine() {
       align: "center" as "center",
       width: 100,
       key: 3,
-      ...getColumnSearchProps('createAt'),
+      //sorter: (a: any, b: any) => a.name.length - b.name.length,
+      ...getColumnSearchProps("createAt"),
     },
     {
-      title: "แก้ไข/ลบ",
+      title: "รายละเอียด / แก้ไข / ลบ",
       dataIndex: "action",
-      width: 100,
+      width: 150,
       align: "center" as "center",
     },
   ];
@@ -142,12 +141,9 @@ function ManageVaccine() {
       okText: "ยืนยัน",
       cancelText: "ยกเลิก",
       onOk: async () => {
-        await axios.delete(
-          `http://localhost:4000/api/vaccine/${id}`,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        await axios.delete(`http://localhost:4000/api/vaccine/${id}`, {
+          headers: { "Content-Type": "application/json" },
+        });
         (window as any).location.reload();
       },
     });
@@ -185,7 +181,18 @@ function ManageVaccine() {
         long: item.long,
         createAt: moment(item.createAt).format("DD MMMM YYYY hh:mm:ss"),
         action: (
-          <div>
+          <>
+            <Button
+              onClick={() => {
+                infoVaccine(item);
+              }}
+              type="primary"
+              icon={<ExclamationCircleOutlined />}
+              style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+            >
+              รายละเอียด
+            </Button>
+
             <EditVaccineForm editVaccineHandle={editVaccine} vaccine={item}>
               <MapEditForm
                 id={"longdo-map" + index}
@@ -193,23 +200,61 @@ function ManageVaccine() {
                 callback={initMap}
               />
             </EditVaccineForm>
+
             <Button
               onClick={() => {
                 confirmDelete(item.id);
               }}
               type="primary"
               danger
-              className="btn-action"
               icon={<DeleteOutlined />}
+              className="btn-action"
+              style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
             >
               ลบข้อมูล
             </Button>
-          </div>
+          </>
         ),
       };
       vaccineList = [...vaccineList, itemVaccine];
     });
     setVaccine(vaccineList);
+  };
+
+  const infoVaccine = async (item: any) => {
+    let res = await axios(
+      `https://api.longdo.com/map/services/address?lon=${item.long}&lat=${item.lat}&key=${mapKey}`
+    );
+    let address = res.data;
+    Modal.info({
+      title: <h4>{item.name}</h4>,
+      width: 550,
+      icon: <ExclamationCircleOutlined />,
+      content: (
+        <div>
+          <p>
+            <span>จำนวน : {item.amount} โดส</span>
+            <br />
+            <span>รายละเอียด : {item.description}</span>
+            <br />
+            <span>อีเมล : {item.email}</span>
+            <br />
+            <span>เบอร์ติดต่อ : {item.tel}</span>
+          </p>
+          <p>
+            <span style={{ fontWeight: "bold" }}>ที่อยู่</span>
+            <br />
+            <span>
+              {address.road} {address.subdistrict} {address.district}{" "}
+              {address.province} {address.country}{" "}
+            </span>
+            <br />
+          </p>
+        </div>
+      ),
+      okText: "Ok",
+      cancelText: "Cancel",
+    });
   };
 
   useEffect(() => {
@@ -220,11 +265,10 @@ function ManageVaccine() {
     <>
       <MainLayouts page="2">
         <Table
+          style={{ padding: 15 }}
           columns={columns}
-          bordered={true}
           dataSource={vaccine}
-          size="middle"
-          pagination={{ pageSize: 3 }}
+          scroll={{ y: 520 }}
         />
       </MainLayouts>
     </>

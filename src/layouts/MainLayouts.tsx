@@ -1,13 +1,22 @@
 import React, { useRef, useState } from "react";
-import { Layout, Menu, Image, Button, Input, Form, InputNumber } from "antd";
+import {
+  Layout,
+  Menu,
+  Image,
+  Button,
+  Input,
+  Form,
+  InputNumber,
+  Modal,
+} from "antd";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   PlusOutlined,
   SearchOutlined,
   MonitorOutlined,
-
   ReloadOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 
 import { FaMapMarkedAlt, FaListAlt, FaUser } from "react-icons/fa";
@@ -15,18 +24,22 @@ import "../styles/MainLayouts.css";
 import { Content } from "antd/lib/layout/layout";
 import VaccineIcon from "../images/vaccine-icon.png";
 import { useHistory } from "react-router-dom";
-import Modal from "antd/lib/modal/Modal";
 import { MapForm, map, longdo } from "../components/MapAddForm";
 import TextArea from "antd/lib/input/TextArea";
 import axios from "axios";
 import { TypeNewVaccine } from "../DataType";
 import ListSearch from "../components/ListSearch";
-import Swal from "sweetalert2";
 
 const { Header, Sider } = Layout;
-// const { Option } = AutoComplete;
+const { confirm } = Modal;
 
-function MainLayouts({ children, page = 1, showDrawer, clearRoute }: any) {
+function MainLayouts({
+  children,
+  page = 1,
+  showDrawer,
+  clearRoute,
+  loadingRoute,
+}: any) {
   const [state, setState] = useState({
     collapsed: false,
   });
@@ -34,8 +47,6 @@ function MainLayouts({ children, page = 1, showDrawer, clearRoute }: any) {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [lat, setLat] = useState<number>(0);
   const [lon, setLon] = useState<number>(0);
-  const [checkUpdate, setCheckUpdate] = useState(false);
-  //const [routeLoading, setRouteLoading] = useState<boolean>(false);
 
   const addressRef = useRef<any>();
   const history = useHistory();
@@ -50,30 +61,22 @@ function MainLayouts({ children, page = 1, showDrawer, clearRoute }: any) {
   // search address keyup
   const onKeyUpSeach = async (e: any) => {
     let res = await axios.get(
-      `https://search.longdo.com/mapsearch/json/search?keyword=${e.target.value}&t=100&key=${mapKey}`
+      `https://search.longdo.com/mapsearch/json/search?keyword=${e.target.value}&limit=100&key=${mapKey}`
     );
     setSuggestions(res.data.data);
-    checkUpdate ? setCheckUpdate(false) : setCheckUpdate(true);
+    //checkUpdate ? setCheckUpdate(false) : setCheckUpdate(true);
   };
 
   const confirmSubmit = (values: any) => {
-    Swal.fire({
-      title: "ยืนยันการเพิ่มข้อมูลวัคซีน",
-      text: "คุณต้องการเพิ่มข้อมูลวัคซีนใช่หรือไม่ ?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "ยืนยัน",
-      cancelButtonText: "ยกเลิก",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(
-          "เพิ่มข้อมูลเรียบร้อย",
-          "ขอบคุณที่แจ้งจุดฉีดวัคซีน",
-          "success"
-        ).then(() => onFinish(values));
-      }
+    confirm({
+      title: "ยืนยันการเพิ่มข้อมูล",
+      icon: <ExclamationCircleOutlined />,
+      centered: true,
+      content: "เพิ่มข้อมูลสำเร็จขอบคุณที่ให้ข้อมูลกับแอพพลิเคชั่น",
+      onOk() {
+        onFinish(values);
+      },
+      onCancel() {},
     });
   };
 
@@ -110,7 +113,7 @@ function MainLayouts({ children, page = 1, showDrawer, clearRoute }: any) {
         title: "คุณอยู่ที่นี่",
       }
     );
-    addressRef.current.state.value = "";
+    addressRef.current.state.value = item.name;
     setSuggestions([]);
   };
 
@@ -186,11 +189,16 @@ function MainLayouts({ children, page = 1, showDrawer, clearRoute }: any) {
                 </Button>
 
                 <Button
-                  style={{ width: 170, marginLeft: 10 }}
+                  style={{
+                    width: 170,
+                    marginLeft: 10,
+                    // backgroundColor: "#011529",
+                    // borderColor: "#011529",
+                  }}
                   type="primary"
                   icon={<MonitorOutlined />}
                   onClick={() => showDrawer()}
-                  //loading={routeLoading}
+                  loading={loadingRoute}
                 >
                   เลือกเส้นทาง
                 </Button>
@@ -198,11 +206,12 @@ function MainLayouts({ children, page = 1, showDrawer, clearRoute }: any) {
                 <Button
                   style={{ width: 170, marginLeft: 10 }}
                   type="primary"
+                  //danger
                   icon={<ReloadOutlined />}
                   onClick={() => clearRoute()}
                   //loading={routeLoading}
                 >
-                  คืนค่าเดิม
+                  ล้างเส้นทาง
                 </Button>
               </>
             ) : null}
@@ -267,13 +276,12 @@ function MainLayouts({ children, page = 1, showDrawer, clearRoute }: any) {
             <Form.Item
               name="search"
               label="พิกัดที่อยู่"
-              //rules={[{ required: true }]}
+              rules={[{ required: true, message: "กรุณากรอกพิกัดที่อยู่" }]}
             >
               <div>
                 <Input
                   prefix={<SearchOutlined />}
                   onKeyUp={(e) => onKeyUpSeach(e)}
-                  //defaultValue={addressRef.current}
                   placeholder="search address"
                   ref={addressRef}
                 />

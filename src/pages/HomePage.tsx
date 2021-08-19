@@ -36,6 +36,7 @@ const HomePage = () => {
   // drawer visible
   const [isDrawerVisible, setIsDrawerVisible] = useState<boolean>(false);
   const [inValidRoute, setInvalidRoute] = useState<boolean>(false);
+  const [loadingRoute, setLoadingRoute] = useState<boolean>(false);
 
   // open modal
   const showModal = () => {
@@ -55,6 +56,7 @@ const HomePage = () => {
 
   // show drawer 
   const showDrawer = async () => {
+    setLoadingRoute(true);
     let location: any = await getCurrentLocation();
     setIsDrawerVisible(true);
     if (latDestination != null) {
@@ -72,8 +74,10 @@ const HomePage = () => {
       );
       map.Route.add({ lon: lngDestination, lat: latDestination });
       map.Route.search();
+      setLoadingRoute(false);
     } else {
       setInvalidRoute(false);
+      setLoadingRoute(false);
     }
   };
 
@@ -183,12 +187,11 @@ const HomePage = () => {
   }
 
   return (
-    <MainLayouts page="1" showDrawer={showDrawer} loadingRoute={setLoading} clearRoute={clearRoute}>
+    <MainLayouts page="1" showDrawer={showDrawer} loadingRoute={loadingRoute} clearRoute={clearRoute}>
       <VaccineMap id="vaccine-map" mapKey={mapKey} callback={initMap} />
-      <Button onClick={() => clearRoute()}> 1234 </Button>
       <Modal
         visible={isModalVisible}
-        title={<b>Vaccine Location</b>}
+        title="ข้อมูลวัคซีน"
         onOk={handleOk}
         onCancel={handleCancel}
         footer={[
@@ -205,38 +208,38 @@ const HomePage = () => {
           </Button>,
         ]}
       >
-        <h4 style={{ fontWeight: "bold" }}>Vaccine {vaccineName}</h4>
-        <p>Have {amount} dosage</p>
+        <h4 style={{ fontWeight: "bold" }}>{vaccineName}</h4>
+        <p>จำนวน {amount} โดส</p>
 
-        <h4 style={{ fontWeight: "bold" }}>Address</h4>
+        <h4 style={{ fontWeight: "bold" }}>จุดฉีด</h4>
         <address>
           {country && (
             <span>
-              Country {country} <br />
+              {country} <br />
             </span>
           )}
 
           {province && (
             <span>
-              Province {province} <br />
+              จังหวัด {province} <br />
             </span>
           )}
 
           {district && (
             <span>
-              District {district} <br />
+              อำเภอ/เขต {district} <br />
             </span>
           )}
 
           {subdistrict && (
             <span>
-              Subdistrict {subdistrict} <br />
+              แขวง/ตำบล {subdistrict} <br />
             </span>
           )}
 
           {road && (
             <span>
-              Road {road} <br />
+              ถนน {road} <br />
             </span>
           )}
 
@@ -251,12 +254,12 @@ const HomePage = () => {
         <p>
           {email && (
             <span>
-              Email: {email} <br />
+              อีเมล : {email} <br />
             </span>
           )}
           {tel && (
             <span>
-              Tel: {tel} <br />
+              เบอร์ติดต่อ : {tel} <br />
             </span>
           )}
         </p>

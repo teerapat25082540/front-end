@@ -59,7 +59,7 @@ const EditVaccineForm = ({ vaccine, editVaccineHandle, children }: Props) => {
   // search address keyup
   const onKeyUpSeach = async (e: any) => {
     let res = await axios.get(
-      `https://search.longdo.com/mapsearch/json/search?keyword=${e.target.value}&t=100&key=${mapKey}`
+      `https://search.longdo.com/mapsearch/json/search?keyword=${e.target.value}&limit=100&key=${mapKey}`
     );
     setSuggestions(res.data.data);
   };
@@ -76,13 +76,12 @@ const EditVaccineForm = ({ vaccine, editVaccineHandle, children }: Props) => {
         title: "I am here",
       }
     );
-    addressRef.current.state.value = "";
+    addressRef.current.state.value = item.name;
     setSuggestions([]);
   };
 
   return (
     <>
-      <div id="maps"></div>
       <Button
         onClick={() => {
           showModal();
@@ -90,22 +89,28 @@ const EditVaccineForm = ({ vaccine, editVaccineHandle, children }: Props) => {
         type="primary"
         className="btn-action"
         icon={<FormOutlined />}
+        style={{
+          borderRadius: 0,
+          backgroundColor: "#ffc404",
+          borderColor: "#ffc404",
+        }}
       >
         แก้ไขข้อมูล
       </Button>
       <Modal
-        title="Edit Vaccine"
+        title="แก้ไขข้อมูลวัคซีน"
         visible={isModalVisible}
-        okText="Save"
+        okText="บันทึก"
+        cancelText="ยกเลิก"
         onOk={handleOk}
-        width={800}
+        width={600}
         onCancel={handleCancel}
+        centered
       >
         <Form
           ref={FormRef}
           name="EditVaccine"
-          labelCol={{ span: 5 }}
-          wrapperCol={{ span: 16 }}
+          layout="vertical"
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           initialValues={{
@@ -116,65 +121,79 @@ const EditVaccineForm = ({ vaccine, editVaccineHandle, children }: Props) => {
             tel: vaccine.tel,
           }}
         >
-          <Form.Item
-            label="Vaccine"
-            name="vaccine"
-            rules={[{ required: true, message: "Please input your vaccine!" }]}
-          >
-            <Input placeholder="Your vaccine name" />
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Form.Item
+              name="vaccine"
+              label="ชื่อวัคซีน"
+              rules={[{ required: true, message: "กรุณากรอกชื่อวัคซีน" }]}
+              style={{ display: "inline-block", width: "calc(50%)" }}
+            >
+              <Input placeholder="ชื่อวัคซีน" />
+            </Form.Item>
+            <Form.Item
+              name="amount"
+              label="จำนวน"
+              rules={[{ required: true, message: "กรุณากรอกจำนวนวัคซีน" }]}
+              style={{
+                display: "inline-block",
+                margin: "0 8px",
+              }}
+            >
+              <InputNumber
+                placeholder="จำนวนโดส"
+                style={{ width: "calc(127%)" }}
+                min={1}
+                max={100000000}
+              />
+            </Form.Item>
           </Form.Item>
 
           <Form.Item
-            label="Amount"
-            name="amount"
-            rules={[{ required: true, message: "Please input your amount!" }]}
-          >
-            <InputNumber style={{ width: "100%" }} min={0} max={100000000} />
-          </Form.Item>
-
-          <Form.Item
-            label="Email"
+            label="อีเมล"
             name="email"
-            rules={[{ required: true, message: "Please input your email!" }]}
+            rules={[{ required: true, message: "กรุณากรอกอีเมล" }]}
           >
-            <Input placeholder="Your email" />
+            <Input placeholder="อีเมล" />
           </Form.Item>
 
           <Form.Item
-            label="Tel"
+            label="เบอร์ติดต่อ"
             name="tel"
-            rules={[{ required: true, message: "Please input your tel!" }]}
+            rules={[{ required: true, message: "กรุณากรอกเบอร์ติดต่อ" }]}
           >
-            <Input placeholder="Your tel" />
+            <Input placeholder="เบอร์ติดต่อ" />
           </Form.Item>
 
           <Form.Item
-            label="Description"
+            label="รายละเอียด"
             name="description"
-            rules={[
-              { required: true, message: "Please input your description!" },
-            ]}
+            rules={[{ required: true, message: "กรุณากรอกรายละเอียด" }]}
           >
             <TextArea
-              placeholder="Your description"
+              placeholder="รายละเอียด"
               rows={3}
               defaultValue={vaccine.description}
             />
           </Form.Item>
 
-          <Form.Item label="Address" name="search">
-            <Input
-              prefix={<SearchOutlined />}
-              size="large"
-              placeholder="search address"
-              onKeyUp={onKeyUpSeach}
-              ref={addressRef}
-            />
-            <ListSearch selectItem={selectSearchItem} data={suggestions} />
-            <div id="box-map" style={{ height: "15em", marginTop: "2px" }}>
-              {children}
+          <Form.Item
+            name="search"
+            label="พิกัดที่อยู่"
+            rules={[{ required: true, message: "กรุณากรอกพิกัดที่อยู่" }]}
+          >
+            <div>
+              <Input
+                prefix={<SearchOutlined />}
+                onKeyUp={(e) => onKeyUpSeach(e)}
+                placeholder="พิกัดที่อยู่"
+                ref={addressRef}
+              />
+              <ListSearch selectItem={selectSearchItem} data={suggestions} />
             </div>
           </Form.Item>
+          <div id="box-map" style={{ height: "250px", marginTop: "10px" }}>
+            {children}
+          </div>
         </Form>
       </Modal>
     </>
